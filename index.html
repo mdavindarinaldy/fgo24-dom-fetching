@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            width: 100svw;
+            height: 100svh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            background-color: aqua;
+        }
+        div#container {
+            display: grid;
+            grid-template-columns: repeat(3,1fr);
+            width: 90%;
+            height: 90%;
+            background-color: aquamarine;
+            overflow-y: scroll;
+        }
+        div#container>div {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-content: center;
+            border: 1px solid gray;
+            gap: 10px;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        div#container>div>span {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="container"></div>
+    <script>
+        async function fetchData(url) {
+            const res = await fetch(url)
+            const data = await res.json()
+            data.results.forEach(item => {
+                const container = document.createElement('div')
+
+                const containerPicture = document.createElement('img')
+                const containerName = document.createElement('span')
+
+                containerPicture.setAttribute('src', item.image) 
+                containerName.textContent = item.name
+
+                container.prepend(containerPicture)
+                container.append(containerName)
+                document.querySelector('div#container').append(container)
+            })
+        }
+        fetchData('https://rickandmortyapi.com/api/character');
+    </script>
+</body>
+</html>
