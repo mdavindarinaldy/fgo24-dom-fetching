@@ -3,24 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>DOM Fetching</title>
     <style>
         body {
             width: 100svw;
-            height: 100svh;
+            height: fit-content;
             overflow: hidden;
             display: flex;
-            flex-direction: row;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             background-color: aqua;
+            gap: 20px;
+            overflow-y: scroll;
         }
         div#container {
             display: grid;
             grid-template-columns: repeat(3,1fr);
             width: 90%;
-            height: 90%;
-            background-color: aquamarine;
+            height: 90svh;
+            background-color: white;
             overflow-y: scroll;
             border: 1px solid black;
             padding: 10px;
@@ -37,6 +39,66 @@
         div#container>div>span {
             text-align: center;
         }
+        button {
+            border: none;
+            background-color: unset;
+        }
+        button:hover {
+            cursor: pointer;
+        }
+        div#search {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        div#search>form {
+            display: flex;
+            flex-direction: row;
+            border: 1px solid #e8e8e8;
+            border-radius: 10px;
+            background-color: white;
+            box-sizing: border-box; 
+            padding: 10px;
+        }
+        input {
+            outline: none;
+            border: none;
+            width: 80svw;
+        }
+        div#search>div:last-child {
+            width: 85svw;
+            height: 85svh;
+            background-color: white;
+            border: 1px solid #e8e8e8;
+            border-radius: 5px;
+            display: grid;
+            grid-template-columns: repeat(1,1fr);
+            gap: 10px;
+            overflow-y: scroll;
+
+        }
+        div#search>div:last-child>div {
+            width: 85svw;
+            height: fit-content;
+            display: flex;
+            flex-direction: row;
+            gap: 10px;
+        }
+        div#search>div:last-child>div>div:last-child {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-self: center;
+            gap: 20px;
+            width: 85svw;
+            height: 300px;
+        }
+        .hide {
+            display: none;
+        }
+        .show {
+            display: flex;
+        }
         @media (max-width: 640px) {
             div#container {
                 grid-template-columns: repeat(1,1fr);
@@ -45,6 +107,14 @@
     </style>
 </head>
 <body>
+    <div id="search">
+        <form id="form">
+            <input type="text" name="search" placeholder="Search Character Name Here">
+            <button type="submit"><img src="./search.svg" alt="search-icon"></button>
+        </form>
+        <div>
+        </div>
+    </div>
     <div id="container"></div>
     <script>
         async function fetchData(url) {
@@ -62,6 +132,47 @@
                 container.prepend(containerPicture)
                 container.append(containerName)
                 document.querySelector('div#container').append(container)
+            })
+            const form = document.getElementById('form')
+            form.addEventListener('submit',function(event) {
+                event.preventDefault()
+                document.getElementById('container').setAttribute('class','hide')
+                let result = event.target.search.value
+                window.localStorage.setItem('result', result)
+                result = window.localStorage.getItem('result')
+                data.results.forEach(item => {
+                    if (item.name.toLowerCase().includes(result.toLowerCase())) {
+                        const resultContainer = document.createElement('div')
+
+                        const imageContainer = document.createElement('img')
+                        imageContainer.setAttribute('src', item.image)
+
+                        const dataContainer = document.createElement('div')
+
+                        document.querySelector(`div#search>div:last-child`).append(resultContainer)
+                        document.querySelector(`div#search>div:last-child>div:last-child`).append(imageContainer)
+                        document.querySelector(`div#search>div:last-child>div:last-child`).append(dataContainer)
+
+                        const nameContainer = document.createElement('div')
+                        const statusContainer = document.createElement('div')
+                        const speciesContainer = document.createElement('div')
+                        const genderContainer = document.createElement('div')
+                        const originContainer = document.createElement('div')
+
+                        nameContainer.textContent = `Nama : ${item.name}`
+                        statusContainer.textContent = `Status : ${item.status}`
+                        speciesContainer.textContent = `Species : ${item.species}`
+                        genderContainer.textContent = `Gender : ${item.gender}`
+                        originContainer.textContent = `Origin : ${item.origin.name}`
+
+                        const temp = document.querySelector('div#search>div:last-child>div:last-child>div:last-child');
+                        temp.append(nameContainer)
+                        temp.append(statusContainer)
+                        temp.append(speciesContainer)
+                        temp.append(genderContainer)
+                        temp.append(originContainer)
+                    }
+                })
             })
         }
         fetchData('https://rickandmortyapi.com/api/character');
