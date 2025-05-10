@@ -3,28 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>DOM Fetching & Filter</title>
     <style>
         body {
             width: 100svw;
             height: 100svh;
             overflow: hidden;
             display: flex;
-            flex-direction: row;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            background-color: aqua;
+            background-color: white;
+            gap: 10px;
         }
         div#container {
             display: grid;
             grid-template-columns: repeat(3,1fr);
             width: 90%;
-            height: 90%;
-            background-color: aquamarine;
+            height: 85%;
+            background-color: white;
             overflow-y: scroll;
             border: 1px solid black;
             padding: 10px;
             box-sizing: border-box;
+            border-radius: 5px;
         }
         div#container>div {
             display: flex;
@@ -35,36 +37,239 @@
             padding: 10px;
         }
         div#container>div>span {
-            text-align: center;
+            align-self: flex-start;
         }
         @media (max-width: 640px) {
             div#container {
                 grid-template-columns: repeat(1,1fr);
             }
         }
+        form {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            height: max-content;
+            width: 90%;
+            box-sizing: border-box;
+            padding: 10px;
+            background-color: white;
+            border: 1px solid #1f1f1f;
+            border-radius: 5px;
+        }
+        form>div:first-child {
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            align-items: center;
+            flex: 1;
+        }
+        input {
+            outline: none;
+            border: none;
+            flex: 1;
+            font-size: 20px;
+        }
+        button {
+            border: none;
+            background-color: unset;
+        }
+        button:hover, li:hover {
+            cursor: pointer;
+        }
+        form>div:last-child {
+            width: 200px;
+            height: fit-content;
+            border: 1px solid #1f1f1f;
+            background-color: white;
+            position: absolute;
+            top: 60px;
+            right: 40px;
+            padding: 5px;
+            border-radius: 5px;
+        }
+        form>div:last-child>ul {
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        form>div:last-child>ul>li {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            justify-content: flex-start;
+            align-items: flex-start;
+        }
+        .show {
+            display: flex;
+        }
+        .hide {
+            display: none;
+        }
+        #filterContainer {
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            width: 90%;
+            height: fit-content;
+            padding: 5px;
+            gap: 3px;
+        }
+        #filterContainer>span {
+            background-color: gray;
+            border-radius: 3px;
+            font-style: italic;
+            font-size: 12px;
+            padding: 2px;
+        }
     </style>
 </head>
 <body>
-    <div id="container"></div>
+    <form id="form">
+        <div>
+            <button type="submit">
+                <img src="./search.svg" alt="filter-icon">
+            </button>
+            <input type="text" name="search" placeholder="Search Character Name in here">
+        </div>
+        <button type="button" id="filterButton">
+            <img src="./filter.svg" alt="filter-icon">
+        </button>
+        <div id="filter" class="hide">
+            <ul>
+                <li id="status">Status
+                    <div class="hide">
+                        <input type="checkbox" id="alive" name="alive" value="alive">
+                        <label for="alive">Alive</label>
+                    </div>
+                    <div class="hide">
+                        <input type="checkbox" id="dead" name="dead" value="dead">
+                        <label for="dead">Dead</label>
+                    </div>
+                    <div class="hide">
+                        <input type="checkbox" id="unknownStatus" name="unknownStatus" value="unknown">
+                        <label for="unknownStatus">Unknown</label>
+                    </div>
+                </li>
+                <li id="species">Species
+                    <div class="hide">
+                        <input type="checkbox" id="human" name="human" value="human">
+                        <label for="human">Human</label>
+                    </div>
+                    <div class="hide">
+                        <input type="checkbox" id="alien" name="alien" value="alien">
+                        <label for="alien">Alien</label>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </form>
+    <div id="filterContainer">
+    </div>
+    <div id="container">
+    </div>
     <script>
+        const btn = document.querySelector('form#form>button')
+
+        btn.addEventListener('click',function(){
+            const view = document.getElementById('filter')
+            view.classList.toggle('hide')
+            view.classList.toggle('show')
+        })
+
+        const liStatus = document.querySelector(`li#status`)
+        liStatus.addEventListener('click',function() {
+            const view = document.querySelectorAll(`li#status>div`)
+            view.forEach((item) => {
+                item.classList.toggle('hide')
+                item.classList.toggle('show')
+            })
+        })
+
+        const liSpecies = document.querySelector(`li#species`)
+        liSpecies.addEventListener('click', function () {
+            const view = document.querySelectorAll(`li#species > div`)
+            view.forEach((item) => {
+                item.classList.toggle('hide')
+                item.classList.toggle('show')
+            })
+        })
+
+        function checked() {
+            let dataChecked = []
+            document.getElementById('filterContainer').innerHTML = ''
+
+            const span = document.createElement('span')
+            span.textContent = 'filter:'
+            document.querySelector('div#filterContainer').append(span)
+
+            const checkbox = document.querySelectorAll('input[type="checkbox"]')
+            checkbox.forEach((item) => {
+                if (item.checked) {
+                    const filterSpan = document.createElement('span')
+                    filterSpan.textContent = item.getAttribute('value')
+                    dataChecked.push(item.getAttribute('value'))
+                    document.querySelector('div#filterContainer').append(filterSpan)
+                }
+            })
+            return dataChecked
+        }
+
+        function filterData(item, dataChecked) {
+            if (dataChecked.length === 0) return true
+
+            return dataChecked.some((check) => {
+                return item.status.toLowerCase() === check || item.species.toLowerCase() === check
+            })
+        }
+
         async function fetchData(url) {
             const res = await fetch(url)
             const data = await res.json()
-            data.results.forEach(item => {
-                const container = document.createElement('div')
+            const form = document.getElementById('form')
 
-                const containerPicture = document.createElement('img')
-                const containerName = document.createElement('span')
+            form.addEventListener('submit', function(event) {
+                event.preventDefault()
+                document.getElementById('container').innerHTML = ''
 
-                containerPicture.setAttribute('src', item.image) 
-                containerName.textContent = item.name
+                const dataChecked = checked()
+                const searchResult = event.target.search.value.toLowerCase()
 
-                container.prepend(containerPicture)
-                container.append(containerName)
-                document.querySelector('div#container').append(container)
+                // Filter data berdasarkan checkbox dan pencarian
+                const filteredData = data.results.filter((item) => {
+                    const matchesSearch = item.name.toLowerCase().includes(searchResult)
+                    const matchesFilter = filterData(item, dataChecked)
+                    return matchesSearch && matchesFilter
+                })
+
+                filteredData.forEach((item) => {
+                    const container = document.createElement('div')
+                    const containerPicture = document.createElement('img')
+                    const containerName = document.createElement('span')
+                    const containerStatus = document.createElement('span')
+                    const containerSpecies = document.createElement('span')
+                    const containerTypes = document.createElement('span')
+                    const containerGender = document.createElement('span')
+                    const containerOrigin = document.createElement('span')
+
+                    containerPicture.setAttribute('src', item.image)
+                    containerName.textContent = `Nama : ${item.name}`
+                    containerStatus.textContent = `Status : ${item.status}`
+                    containerSpecies.textContent = `Species : ${item.species}`
+                    containerTypes.textContent = `Species Type : ${item.type || '-'}`
+                    containerGender.textContent = `Gender : ${item.gender}`
+                    containerOrigin.textContent = `Origin : ${item.origin.name}`
+
+                    container.prepend(containerPicture)
+                    container.append(containerName, containerStatus, containerSpecies, containerTypes, containerGender, containerOrigin)
+                    document.querySelector('div#container').append(container)
+                })
             })
         }
-        fetchData('https://rickandmortyapi.com/api/character');
+
+        fetchData('https://rickandmortyapi.com/api/character')
     </script>
 </body>
 </html>
